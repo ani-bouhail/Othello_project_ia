@@ -4,10 +4,10 @@ Conception d'un jeu stratégique humain vs IA en Python, avec 3 niveaux de diffi
 
 ## 👥 Équipe
 
-| Membre   | Branche Git  |
-|----------|-------------|
-| Anis     | `anis`      |
-| Philippe | `philippe`  |
+| Membre                | Branche Git               |
+|-----------------------|---------------------------|
+| Anis                  | `anis`(branche actuelle)  |
+| Philippe              | `philippe`                |
 
 ## 📁 Structure du projet
 
