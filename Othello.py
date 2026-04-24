@@ -167,13 +167,22 @@ class Othello:
 
 
 
-# Initialisation du jeu
+import src.ai.minimax as mm
+
+# ─────────────────────────────────────────────
+#  Configuration des niveaux de difficulté
+# ─────────────────────────────────────────────
+
+NIVEAUX = {
+    "1": {"nom": "Facile",  "eval_fn": mm.evaluate_pions,          "depth": 2},
+    "2": {"nom": "Moyen",   "eval_fn": mm.evaluate_mobilite,       "depth": 4},
+    "3": {"nom": "Fort",    "eval_fn": mm.evaluate_positionnelle,   "depth": 6},
+}
+
 if __name__ == "__main__":
     game = Othello()
     consecutive_passes = 0
-    DEPTH = 3  # Profondeur de recherche de l'IA
 
-    # --- Choix du mode de jeu ---
     print("=== OTHELLO ===")
     print("1. Joueur vs Joueur")
     print("2. Joueur vs IA")
@@ -181,10 +190,10 @@ if __name__ == "__main__":
         mode = input("Choisissez un mode (1 ou 2) : ").strip()
         if mode in ("1", "2"):
             break
-        print("Choix invalide, entrez 1 ou 2.")
+        print("Choix invalide.")
 
     if mode == "2":
-        print("L'IA joue quel camp ?")
+        print("\nQuel camp joue l'IA ?")
         print("1. Noir (commence en premier)")
         print("2. Blanc")
         while True:
@@ -193,27 +202,37 @@ if __name__ == "__main__":
                 break
             print("Choix invalide.")
         IA_PLAYER = 1 if camp == "1" else -1
-    else:
-        IA_PLAYER = None  # Pas d'IA en mode JvJ
 
-    # --- Boucle de jeu ---
+        print("\nNiveau de difficulté de l'IA :")
+        print("1. Facile  (différence de pions,  profondeur 2)")
+        print("2. Moyen   (mobilité,              profondeur 4)")
+        print("3. Fort    (contrôle des coins,    profondeur 6)")
+        while True:
+            niveau = input("Choisissez (1, 2 ou 3) : ").strip()
+            if niveau in NIVEAUX:
+                break
+            print("Choix invalide.")
+
+        config = NIVEAUX[niveau]
+        print(f"\n→ IA niveau {config['nom']} sélectionnée.\n")
+    else:
+        IA_PLAYER = None
+        config = None
+
+    # ─────────────────────────────────────────────
+    #  Boucle de jeu
+    # ─────────────────────────────────────────────
+
     while True:
         game.display()
 
         if game.turn == 1:
-            if mode == "2" and IA_PLAYER == 1:
-                player_name = "Noir (IA)"
-            else:
-                player_name = "Noir (Humain)"
+            player_name = "Noir (IA)" if (mode == "2" and IA_PLAYER == 1) else "Noir (Humain)"
         else:
-            if mode == "2" and IA_PLAYER == -1:
-                player_name = "Blanc (IA)"
-            else:
-                player_name = "Blanc (Humain)"
+            player_name = "Blanc (IA)" if (mode == "2" and IA_PLAYER == -1) else "Blanc (Humain)"
 
         print(f"--- Tour de {player_name} ---")
 
-        # Vérification si le joueur peut jouer
         if not game.has_valid_move(game.turn):
             print(f"Aucun coup possible pour {player_name} ! Il passe son tour.")
             consecutive_passes += 1
@@ -228,7 +247,14 @@ if __name__ == "__main__":
         # Tour de l'IA
         if mode == "2" and game.turn == IA_PLAYER:
             print("L'IA réfléchit...")
-            _, best_move = game.minimax(DEPTH, IA_PLAYER)
+            mm.reset_counter()
+            _, best_move = mm.minimax_alphabeta(
+                game,
+                depth=config["depth"],
+                player=game.turn,
+                eval_fn=config["eval_fn"]
+            )
+            print(f"Nœuds explorés : {mm.get_counter()}")
             if best_move:
                 x, y = best_move
                 print(f"L'IA joue en {x},{y}")
@@ -249,18 +275,14 @@ if __name__ == "__main__":
                         game.turn *= -1
                         break
                     else:
-                        print("Coup invalide (ne retourne aucun pion adverse). Réessayez.")
+                        print("Coup invalide. Réessayez.")
                 except ValueError:
                     print("Format invalide. Entrez deux chiffres séparés par une virgule.")
 
-    # --- Résultats ---
     print("\n--- RÉSULTATS ---")
     game.display()
     black, white = game.get_score()
     print(f"Score Final -> Noir: {black} | Blanc: {white}")
-    if black > white:
-        print("Victoire des NOIRS !")
-    elif white > black:
-        print("Victoire des BLANCS !")
-    else:
-        print("ÉGALITÉ PARFAITE !")
+    if black > white:   print("Victoire des NOIRS !")
+    elif white > black: print("Victoire des BLANCS !")
+    else:               print("ÉGALITÉ PARFAITE !")
