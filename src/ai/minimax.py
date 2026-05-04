@@ -114,7 +114,13 @@ def minimax(board, depth, player, eval_fn=evaluate_pions, root_player=None):
     moves = board.get_valid_moves(player)
 
     # Cas terminal
-    if depth == 0 or (not moves and not board.get_valid_moves(-player)):
+    game_over = not moves and not board.get_valid_moves(-player)
+    if depth == 0 or game_over:
+        if game_over:
+            black, white = board.get_score()
+            diff = black - white
+            raw_score = 10000 + diff if diff > 0 else (-10000 + diff if diff < 0 else 0)
+            return raw_score if root_player == 1 else -raw_score, None
         return _score_for_player(board, eval_fn, root_player), None
 
     # Si le joueur courant ne peut pas jouer, il passe
@@ -181,7 +187,13 @@ def minimax_alphabeta(
     moves = board.get_valid_moves(player)
 
     # Cas terminal
-    if depth == 0 or (not moves and not board.get_valid_moves(-player)):
+    game_over = not moves and not board.get_valid_moves(-player)
+    if depth == 0 or game_over:
+        if game_over:
+            black, white = board.get_score()
+            diff = black - white
+            raw_score = 10000 + diff if diff > 0 else (-10000 + diff if diff < 0 else 0)
+            return raw_score if root_player == 1 else -raw_score, None
         return _score_for_player(board, eval_fn, root_player), None
 
     # Passe
