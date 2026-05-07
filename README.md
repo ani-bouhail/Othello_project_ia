@@ -58,7 +58,7 @@ git push origin anis    # ou: git push origin philippe
 
 ## 📋 TODO
 
-- [ ] Implémenter l'élagage alpha-bêta
-- [ ] Ajouter 3 niveaux de difficulté
-- [ ] Organiser les tournois IA vs IA
-- [ ] Rédiger le rapport
+- [✅] Implémenter l'élagage alpha-bêta
+- [✅] Ajouter 3 niveaux de difficulté
+- [✅] Organiser les tournois IA vs IA
+- [✅] Rédiger le rapport
